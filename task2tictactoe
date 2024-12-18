@@ -1,0 +1,189 @@
+using System;
+public class Program
+{
+    public static void Menu()
+    {
+        Console.BackgroundColor = ConsoleColor.Magenta;
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.Clear();
+        string[] menu = { "1. New Game", //"Creating menu"
+            "2. About the author", 
+            "3. Exit" };
+        foreach (string sentence in menu) Console.WriteLine(sentence);
+        Console.WriteLine();
+    }
+    public static bool WhoWins(string[] boxes)
+    {
+        for (int i = 0; i<=6; i+=3) //"Checking if X or O won by filling the row"
+        {
+            if (boxes[i] == "X" && boxes[i + 1] == "X" && boxes[i + 2] == "X"
+                || boxes[i] == "O" && boxes[i + 1] == "O" && boxes[i + 2] == "O")
+            {
+                Console.WriteLine();
+                if (boxes[i] == "X") Console.WriteLine("X wins!");
+                if (boxes[i] == "O") Console.WriteLine("O wins!");
+                return true;
+            }
+        }
+        for (int i = 0; i <= 2; i ++) //"Checking if X or O won by filling the column"
+        {
+            if (boxes[i] == "X" && boxes[i + 3] == "X" && boxes[i + 6] == "X"
+                || boxes[i] == "O" && boxes[i + 3] == "O" && boxes[i + 6] == "O")
+            {
+                Console.WriteLine();
+                if (boxes[i] == "X") Console.WriteLine("X wins!");
+                if (boxes[i] == "O") Console.WriteLine("O wins!");
+                return true;
+            }
+        }
+        int dif = 4; 
+        for (int i = 0; i <= 2; i+=2) //"Checking if X or O won by filling the spaces across"
+        {
+            if (boxes[i] == "X" && boxes[i + dif] == "X" && boxes[i + 2*dif] == "X"
+                || boxes[i] == "O" && boxes[i + dif] == "O" && boxes[i + 2 * dif] == "O")
+            {
+                Console.WriteLine();
+                if (boxes[i] == "X") Console.WriteLine("X wins!");
+                if (boxes[i] == "O") Console.WriteLine("O wins!");
+                return true;
+            }
+            dif = 2;
+        }
+        return false;
+    }
+    public static void NewGame()
+    {
+        Console.Clear();
+        bool stopGame = false;
+        Console.WriteLine("Welcome to tic-tac-toe!"); //"Instructions for the user"
+        Console.WriteLine("You will now be able to put first 'X', then 'O' in spaces from 1 to 9 counting from the left, upper place");
+        Console.WriteLine("Let's begin!");
+        string[] boxes = Boxes();
+        Board(boxes);
+        string sym = "O";
+        bool change = true; //"Creating variable that will ensure that the symbol won't change in case user uses illegal move"
+        do
+        {
+            if (sym == "O" && change) sym = "X";
+            else if (sym == "X" && change) sym = "O";
+            Console.WriteLine();
+            Console.WriteLine("Please choose a number from 1 to 9"); //"Beginning the game"
+            bool read = int.TryParse(Console.ReadLine(), out int place);
+            switch (place)
+            {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                    if (Check(place - 1, boxes))
+                    {
+                        boxes[place - 1] = FillingSpaces(place - 1, sym);
+                        change = true;
+                    }
+                    else change = false;
+                    break;
+                default:
+                    Console.WriteLine("Illegal move! Please remember that you can only choose numbers between 1 and 9!");
+                    change = false;
+                    break;
+            }
+            if (change) Board(boxes); //"Updating the board"
+            stopGame = WhoWins(boxes);
+            if (stopGame) break;
+        }
+        while (boxes[0] == " " || boxes[1] == " " || boxes[2] == " " || boxes[3] == " " || boxes[4] == " " || 
+        boxes[5] == " " || boxes[6] == " " || boxes[7] == " " || boxes[8] == " ");
+        Console.WriteLine("Game over!"); //"The game ends"
+        Console.WriteLine("Please click 'Enter' to come back to main menu!");
+    }
+    public static void AboutTheAuthor()
+    {
+        Console.Clear();
+        string[] information = {"Hello :) My name is Maja",
+            "Here is some information about me:",
+            "1. My hobby is horse-riding",
+            "2. My favourite game is God of War",
+            "3. I'm a big anime fan",
+            "Thank you for choosing to play my game!"};
+        foreach (string line in information) Console.WriteLine(line);
+        Console.WriteLine("Please click 'Enter' to come back to main menu!");
+
+    }
+    public static string[] Boxes()
+    {
+        string[] boxes = new string[9]; //"Creating array for spaces, in which the user will put a symbol later
+        for (int i = 0; i < boxes.Length; i++) boxes[i] = " ";
+        return boxes;
+    }
+    public static void Board(string[] boxes)
+    {
+        Console.WriteLine($" {boxes[0]} | {boxes[1]} | {boxes[2]}"); //"Creating rows and collums for the board."
+        Console.WriteLine("---+---+---");
+        Console.WriteLine($" {boxes[3]} | {boxes[4]} | {boxes[5]}");
+        Console.WriteLine("---+---+---");
+        Console.WriteLine($" {boxes[6]} | {boxes[7]} | {boxes[8]}");
+        Console.WriteLine();
+    }
+    public static bool Check(int space, string[] boxes)
+    {
+        if (boxes[space] != " ")
+        {
+            Console.WriteLine("Illegal move! Please remember that you cannot use the same space again!");
+            return false;
+        }
+        return true;
+    }
+    public static string FillingSpaces(int space, string sym)
+    {
+        string[] boxes = Boxes();
+        boxes[space] = sym;
+        Console.WriteLine($"{sym} moves to {space+1}!");
+        Console.WriteLine();
+        return sym;
+    }
+    public static void Main()
+    {
+        Menu();
+        bool quit = false;
+        bool D3pressed = false; //"creating a variable to ensure that Y and N key work only after pressing 3"
+        do
+        {
+            if (Console.KeyAvailable)
+            {
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                string key = keyInfo.Key.ToString(); //"Putting a key pressed by user in a variable"
+                switch (key)
+                {
+                    case "D1":
+                        NewGame();
+                        break;
+                    case "D2":
+                        AboutTheAuthor();
+                        break;
+                    case "D3":
+                        D3pressed = true;
+                        Console.WriteLine("Are you sure you want to quit? [y/n]");
+                        break;
+                    case "Enter":
+                        Menu();
+                        break;
+                    case "Y":
+                        if (D3pressed) quit = true;
+                        D3pressed = false;
+                        break;
+                    case "N":
+                        if (D3pressed) Menu();
+                        D3pressed = false;
+                        break;
+                }
+                if (quit) break;
+            }
+        }
+        while (true);
+    }
+}
